@@ -1,4 +1,5 @@
 import math
+import itertools
 
 class cls:
 	pass
@@ -310,23 +311,18 @@ class TTFCmap:
 			return self["glyphIndexArray"][code] if code < 256 else 0
 		self._getGlyphIndex = _getGlyphIndex
 
-		def _getGlyphIndexs():
-			return self["glyphIndexArray"]
-		self._getGlyphIndexs = _getGlyphIndexs
-
-		pass
-
-	def _getGlyphIndex(self):
-
+		def _getGlyphindexes():
+			return range(len(self["glyphIndexArray"]))
+		self._getGlyphindexes = _getGlyphindexes
 		pass
 
 	def _initFormat4(self, fp, offset):
 		self["length"] = getUint16(fp, offset+2)
 		self["language"] = getUint16(fp, offset+4)
-		self["segCount"] = getUint16(fp, offset + 6 )/2
-		self["searchRange"] = getUint16(fp, offset + 8 )
+		self["segCount"] = getUint16(fp, offset + 6)/2
+		self["searchRange"] = getUint16(fp, offset + 8)
 		self["entrySelector"] = getUint16(fp, offset + 10)
-		self["rangeShift"] = getUint16(fp, offset + 12 )
+		self["rangeShift"] = getUint16(fp, offset + 12)
 
 		self["endCode"] = []
 		self["startCode"] = []
@@ -359,18 +355,26 @@ class TTFCmap:
 			endCode = self["endCode"][segmentIndex]
 
 			if idRangeOffset == 0:
-				if code >= startCode and code <= endCode:
-					code += idDelta
-					print(code)
-					return code
-				else:
-					return 0
-				pass
+				return code + idDelta if code >= startCode and code <= endCode else 0
 			else:
 				raise 'Not support cmap format4 with idRangeOffset is not zero yet! Please submit an issue at github'
 				pass
 			pass
 		self._getGlyphIndex = _getGlyphIndex
+		
+		def _getGlyphindexes():
+			def _getIndexList(index):
+				idRangeOffset = self["idRangeOffset"][index]
+				startCode = self["startCode"][index]
+				endCode = self["endCode"][index]
+				if idRangeOffset == 0:
+					return range(startCode, endCode + 1)
+				else:
+					raise 'Not support cmap format4 with idRangeOffset is not zero yet! Please submit an issue at github'
+					pass
+				pass
+			return map(_getIndexList, range(len(self["endCode"])))
+		self._getGlyphindexes = _getGlyphindexes
 		pass
 	pass
 
@@ -402,51 +406,51 @@ class TTF:
 
 			# head
 			headOffset = self.tableDirectory["head"]["offset"]
-			self["head"] = {}
-			self["head"]["version"] = getFixed(fp, headOffset)
-			self["head"]["fontRevision"] = getFixed(fp, headOffset + 4)
-			self["head"]["checkSumAdjustment"] = hex(getUint32(fp, headOffset + 8))[2:]
-			self["head"]["magickNumber"] = hex(getUint32(fp, headOffset + 12))[2:]
-			self["head"]["flags"] = padZero(bin(getUint16(fp, headOffset + 16))[2:], 16)
-			self["head"]["unitsPerEm"] = getUint16(fp, headOffset + 18)
-			self["head"]["xMin"] = getInt16(fp, headOffset + 36)
-			self["head"]["yMin"] = getInt16(fp, headOffset + 38)
-			self["head"]["xMax"] = getInt16(fp, headOffset + 40)
-			self["head"]["yMax"] = getInt16(fp, headOffset + 42)
-			self["head"]["macStyle"] = padZero(bin(getUint16(fp, headOffset + 44))[2:], 16)
-			self["head"]["lowestRecPPEM"] = getUint16(fp, headOffset + 46)
-			self["head"]["fontDirectionHint"] = getInt16(fp, headOffset + 48)
-			self["head"]["indexToLocFormat"] = getInt16(fp, headOffset + 50)
-			self["head"]["glyphDataFormat"] = getInt16(fp, headOffset + 52)
+			self.head = cls()
+			self.head.version = getFixed(fp, headOffset)
+			self.head.fontRevision = getFixed(fp, headOffset + 4)
+			self.head.checkSumAdjustment = hex(getUint32(fp, headOffset + 8))[2:]
+			self.head.magickNumber = hex(getUint32(fp, headOffset + 12))[2:]
+			self.head.flags = padZero(bin(getUint16(fp, headOffset + 16))[2:], 16)
+			self.head.unitsPerEm = getUint16(fp, headOffset + 18)
+			self.head.xMin = getInt16(fp, headOffset + 36)
+			self.head.yMin = getInt16(fp, headOffset + 38)
+			self.head.xMax = getInt16(fp, headOffset + 40)
+			self.head.yMax = getInt16(fp, headOffset + 42)
+			self.head.macStyle = padZero(bin(getUint16(fp, headOffset + 44))[2:], 16)
+			self.head.lowestRecPPEM = getUint16(fp, headOffset + 46)
+			self.head.fontDirectionHint = getInt16(fp, headOffset + 48)
+			self.head.indexToLocFormat = getInt16(fp, headOffset + 50)
+			self.head.glyphDataFormat = getInt16(fp, headOffset + 52)
 			
 			# maxp
 			maxpOffset = self.tableDirectory["maxp"]["offset"]
-			self["maxp"] = {}
-			self["maxp"]["version"] = getFixed(fp, maxpOffset)
-			self["maxp"]["numGlyphs"] = getUint16(fp, maxpOffset + 4)
-			self["maxp"]["maxPoints"] = getUint16(fp, maxpOffset + 6)
-			self["maxp"]["maxCompositePoints"] = getUint16(fp, maxpOffset + 8)
-			self["maxp"]["maxCompositeContours"] = getUint16(fp, maxpOffset + 10)
-			self["maxp"]["maxZones"] = getUint16(fp, maxpOffset + 12)
-			self["maxp"]["maxTwilightPoints"] = getUint16(fp, maxpOffset + 14)
-			self["maxp"]["maxStorage"] = getUint16(fp, maxpOffset + 16)
-			self["maxp"]["maxFunctionDefs"] = getUint16(fp, maxpOffset + 18)
-			self["maxp"]["maxInstructionDefs"] = getUint16(fp, maxpOffset + 20)
-			self["maxp"]["maxStackElements"] = getUint16(fp, maxpOffset + 22)
-			self["maxp"]["maxSizeOfInstructions"] = getUint16(fp, maxpOffset + 26)
-			self["maxp"]["maxComponentElements"] = getUint16(fp, maxpOffset + 28)
-			self["maxp"]["maxComponentDepth"] = getUint16(fp, maxpOffset + 30)
+			self.maxp = cls()
+			self.maxp.version = getFixed(fp, maxpOffset)
+			self.maxp.numGlyphs = getUint16(fp, maxpOffset + 4)
+			self.maxp.maxPoints = getUint16(fp, maxpOffset + 6)
+			self.maxp.maxCompositePoints = getUint16(fp, maxpOffset + 8)
+			self.maxp.maxCompositeContours = getUint16(fp, maxpOffset + 10)
+			self.maxp.maxZones = getUint16(fp, maxpOffset + 12)
+			self.maxp.maxTwilightPoints = getUint16(fp, maxpOffset + 14)
+			self.maxp.maxStorage = getUint16(fp, maxpOffset + 16)
+			self.maxp.maxFunctionDefs = getUint16(fp, maxpOffset + 18)
+			self.maxp.maxInstructionDefs = getUint16(fp, maxpOffset + 20)
+			self.maxp.maxStackElements = getUint16(fp, maxpOffset + 22)
+			self.maxp.maxSizeOfInstructions = getUint16(fp, maxpOffset + 26)
+			self.maxp.maxComponentElements = getUint16(fp, maxpOffset + 28)
+			self.maxp.maxComponentDepth = getUint16(fp, maxpOffset + 30)
 			
 			# loca
 			locaOffset = self.tableDirectory["loca"]["offset"]
 			self.loca = []
 			self.locaOffsetSize = []
 
-			locaType = getUint16 if (self["head"]["indexToLocFormat"] == 0) else getUint32
-			locaSize = 2 if (self["head"]["indexToLocFormat"] == 0) else 4
-			locaRatio = 2 if (self["head"]["indexToLocFormat"] == 0) else 1
+			locaType = getUint16 if (self.head.indexToLocFormat == 0) else getUint32
+			locaSize = 2 if (self.head.indexToLocFormat == 0) else 4
+			locaRatio = 2 if (self.head.indexToLocFormat == 0) else 1
 
-			for i in xrange(self["maxp"]["numGlyphs"]):
+			for i in xrange(self.maxp.numGlyphs):
 				self.loca.append(locaType(fp, locaOffset)
 						* locaRatio)
 				self.locaOffsetSize.append(locaOffset)
@@ -475,26 +479,36 @@ class TTF:
 			self.cmap.numberSubtables = getUint16(fp, cmapOffset + 2)
 			self.cmap.tables = []
 			for i in range(self.cmap.numberSubtables):
-				table = {}
-				table["platformID"] = getUint16(fp, cmapOffset + 8*i + 4)
-				table["platformSpecificID"] = getUint16(fp, cmapOffset + 8*i + 6)
-				table["offset"] = getUint32(fp, cmapOffset + 8*i + 8)
-				table["data"] = TTFCmap(fp, cmapOffset + table["offset"])
-
+				table = cls()
+				table.platformID = getUint16(fp, cmapOffset + 8*i + 4)
+				table.platformSpecificID = getUint16(fp, cmapOffset + 8*i + 6)
+				table.offset = getUint32(fp, cmapOffset + 8*i + 8)
+				table.format = getUint16(fp, cmapOffset + table.offset);
+				
+				# ignore format 0
+				if table.format != 4:
+					continue
+				table.data = TTFCmap(fp, cmapOffset + table.offset)
 				self.cmap.tables.append(table)
 				pass
 
 			def getGlyphIndex(ch):
 				def getIndex(item):
-					return item["data"]._getGlyphIndex(ch)
-				return map(getIndex, self.cmap["tables"])
-
-			def getGlyphIndexs():
-				def getIndexs():
-					return item["data"]._getGlyphIndexs
-				return map(getIndex, self.cmap["tables"])
-
-			self.cmap["getGlyphIndex"] = getGlyphIndex
+					return item.data._getGlyphIndex(ch)
+				return map(getIndex, self.cmap.tables)
+			self.cmap.getGlyphIndex = getGlyphIndex
+			
+			def getGlyphindexes():
+				def getindexes(item):
+					return set(reduce(list.__add__, item.data._getGlyphindexes()))
+				l = map(getindexes, self.cmap.tables)
+				uniq =  set(val for sublist in l for val in sublist)
+				if 0xffff in uniq:
+					uniq.remove(0xffff)
+					pass
+				return sorted(list(uniq))
+			self.cmap.getGlyphindexes = getGlyphindexes
+			
 			pass
 		pass
 	pass
@@ -503,8 +517,9 @@ if __name__ == '__main__':
 	fontfile = "LLIconfont.ttf"
 	ttf = TTF(fontfile)
 	ttf.readTables()
-	t = ttf.cmap.getGlyphIndex(u'\ue600')
-
+	t = ttf.cmap.getGlyphIndex(u'\uffff')
+	print(t)
+	t = ttf.cmap.getGlyphindexes()
 	print(t)
 
 
