@@ -1,5 +1,8 @@
+#!/usr/bin/python
 import math
-import itertools
+import json
+import hashlib
+import re
 
 class cls:
 	pass
@@ -118,164 +121,6 @@ class TTFGlyf:
 		self.flagsOffset = offset
 		# self._readGlyfCoordinates()
 		pass
-
-	# def readGlyfCoordinates:
-	# 	if self.numberOfContours >= 0:
-	# 		self._readSimpleGlyf()
-	# 		pass
-	# 	pass
-
-	# def _readSimpleGlyf:
-	# 	offset = self.flagsOffset
-
-	# 	totalOfCoordinates = self.endPtsOfContours[len(self.endPtsOfContours) - 1] + 1
-	# 	self.totalOfCoordinates = totalOfCoordinates
-
-	# 	i = 0
-	# 	while i < totalOfCoordinates:
-	# 		flag = getUint8(fp, offset)
-	# 		self.flags.append(flag)
-	# 		offset++
-	# 		i++
-
-	# 		if flag & 8 and i < totalOfCoordinates:
-	# 			repeat = getUint8(fp, offset)
-	# 			offset++
-	# 			self.flagsOrig.append(repeat)
-	# 			for j in xrange(repeat):
-	# 				self.flags.append(flag)
-	# 				i++
-	# 				pass
-	# 			pass
-	# 		pass
-
-	# 	self.xCoorinateOffset = offset
-	# 	prevX = 0
-	# 	for i in range(self.flags.length):
-	# 		x = 0
-	# 		flag = self.flags[i]
-
-	# 		if flag & 2:
-	# 			x = getUint8(fp, offset)
-	# 			offset += 1
-	# 			x = (flag & 16) ? x : -1 * x
-	# 		elif flag & 16:
-	# 			x = 0
-	# 		else:
-	# 			x = getInt16(fp, offset)
-	# 			offset += 2
-	# 			pass
-
-	# 		prevX += x
-	# 		self.xCoordinates[i] = prevX
-	# 		self.coordinates[i] = {
-	# 			"x" : prevX,
-	# 			"y" : 0,
-	# 			"isOnCurve" : Boolean(flag & 1)
-	# 		}
-	# 	}
-
-	# 	self.yCoorinateOffset = offset
-	# 	prevY = 0
-	# 	for i in xrange(len(self.flags):
-	# 		y = 0
-	# 		flag = self.flags[i]
-
-	# 		if flag & 4:
-	# 			y = getUint8(fp, offset)
-	# 			offset++
-	# 			y = y if (flag & 32) else -1 * y
-	# 		elif flag & 32:
-	# 			y = 0
-	# 		else:
-	# 			y = getInt16(fp, offset)
-	# 			offset += 2
-			
-	# 		prevY += y
-	# 		self.yCoordinates[i] = prevY
-	# 		if self.coordinates.has_key(i):
-	# 			self.coordinates[i].y = prevY
-	# 			pass
-	# 		pass
-
-	# 	pathArray = []
-	# 	startPts = 0
-
-	# 	endPts = self.endPtsOfContours[i]
-	# 	for i in xrange(len(self.endPtsOfContours):
-	# 		try {
-	# 			for currentPts in xrange(endPts + 1):
-	# 				path = ""
-	# 				currentPoint = self.coordinates[currentPts]
-	# 				prevPoint = self.coordinates[endPts] if (currentPts == startPts) else self.coordinates[currentPts - 1]
-	# 				nextPoint = self.coordinates[startPts] if (currentPts == endPts) else self.coordinates[currentPts + 1]
-
-	# 				if (typeof currentPoint === 'undefined') {
-	# 					continue
-	# 				}
-
-	# 				if (currentPts === startPts) { 						if (currentPoint.isOnCurve) {
-	# 						path += "M" + currentPoint.x + "," + currentPoint.y
-	# 								+ " "
-	# 					} else { 
-	# 													midPoint = {
-	# 							x : (prevPoint.x + currentPoint.x) / 2,
-	# 							y : (prevPoint.y + currentPoint.y) / 2
-	# 						}
-	# 						path += "M" + midPoint.x + "," + midPoint.y + " Q"
-	# 								+ currentPoint.x + "," + currentPoint.y
-	# 								+ " "
-	# 					}
-	# 				} else {
-	# 											if (typeof currentPoint !== 'undefined'
-	# 							&& typeof currentPoint.isOnCurve === 'boolean'
-	# 							&& currentPoint.isOnCurve
-	# 							&& typeof prevPoint !== 'undefined'
-	# 							&& typeof prevPoint.isOnCurve === 'boolean'
-	# 							&& prevPoint.isOnCurve) { 							path += " L"
-	# 					} else if (currentPoint.isOnCurve === false
-	# 							&& typeof prevPoint !== 'undefined'
-	# 							&& typeof prevPoint.isOnCurve === 'boolean'
-	# 							&& prevPoint.isOnCurve === false) { 
-	# 													midPoint = {
-	# 							x : (prevPoint.x + currentPoint.x) / 2,
-	# 							y : (prevPoint.y + currentPoint.y) / 2
-	# 						}
-	# 						path += midPoint.x + "," + midPoint.y + " "
-	# 					} else if (!currentPoint.isOnCurve) { 							path += " Q"
-	# 					}
-
-	# 											path += currentPoint.x + "," + currentPoint.y + " "
-	# 				}
-	# 				pathArray.append(path)
-	# 			}
-
-	# 							if (!currentPoint.isOnCurve
-	# 					&& typeof self.coordinates[startPts] !== 'undefined') {
-
-	# 								  if (self.coordinates[startPts].isOnCurve) {
-	# 					pathArray.append(self.coordinates[startPts].x + ","
-	# 							+ self.coordinates[startPts].y + " ")
-	# 				} else {
-	# 					midPoint = {
-	# 							x : (currentPoint.x + self.coordinates[startPts].x) / 2,
-	# 							y : (currentPoint.y + self.coordinates[startPts].y) / 2
-	# 						}
-	# 					pathArray.append(midPoint.x + "," + midPoint.y + " ")
-	# 				}
-	# 			}
-
-	# 							pathArray.append(" Z ")
-
-	# 							startPts = self.endPtsOfContours[i] + 1
-	# 		} catch (e) {
-	# 							console.log(e)
-	# 			console.log(currentPoint, prevPoint, nextPoint, self.
-	# 		}
-	# 	}
-	# 	self.pathArray = pathArray
-	# 	self.path = pathArray.join(" ")
-	# }
 
 class TTFCmap:
 
@@ -513,13 +358,49 @@ class TTF:
 		pass
 	pass
 
-if __name__ == '__main__':
-	fontfile = "LLIconfont.ttf"
-	ttf = TTF(fontfile)
-	ttf.readTables()
-	t = ttf.cmap.getGlyphIndex(u'\uffff')
-	print(t)
-	t = ttf.cmap.getGlyphindexes()
-	print(t)
+def checkIconFont(home):
+	needProcess = True
+	with open(home + "IconFont.json", "r") as fp:
+		config = json.load(fp)
+		newHash = hashlib.md5(home + config["font"]).hexdigest()
+		if not config.has_key("checksum") or config["checksum"] != newHash:
+			needProcess = True
+			pass
+	# write code point list to source file
+	if needProcess:
+		fontfile = home + config["font"]
+		print(fontfile)
+		ttf = TTF(fontfile)
+		ttf.readTables()
+		str = ''
+		for code in ttf.cmap.getGlyphindexes():
+			text = "\U%08x" % code if code > 0xff else "%c" % code
+			str += 'static NSString *const u%04x = @"%s";\n' % (code, text)
+			pass
+		str = "/* IconFont Unicode Start */\n" + str + "/* IconFont Unicode End */"
+		with open(home + config["define"]) as fp:
+			content = fp.read()
+			pass
+		newContent = re.sub("\/[*]+ IconFont Unicode Start [*]+\/[\s\S]*\/[*]+ IconFont Unicode End [*]+/", str, content)
+		with open(home + config["define"], "w") as fp:
+			fp.write(newContent)
+			pass
+		config["checksum"] = newHash
+		with open(home + "IconFont.json", "w") as fp:
+			json.dump(config, fp)
+			pass
+		pass
+	pass
+
+checkIconFont("")
+
+# if __name__ == '__main__':
+# 	fontfile = "LLIconfont.ttf"
+# 	ttf = TTF(fontfile)
+# 	ttf.readTables()
+	# t = ttf.cmap.getGlyphIndex(u'\uffff')
+	# print(t)
+
+	
 
 
